@@ -371,12 +371,19 @@ objects:
             GOGS_PWD=gogs
 
             oc rollout status dc gogs
-
-            _RETURN=$(curl -o /tmp/curl.log -sL --post302 -w "%{http_code}" http://$GOGS_SVC:3000/user/sign_up \
-              --form user_name=$GOGS_USER \
-              --form password=$GOGS_PWD \
-              --form retype=$GOGS_PWD \
-              --form email=admin@gogs.com)
+            for i in {1..10}
+            do
+              sleep 5
+              _RETURN=$(curl -o /tmp/curl.log -sL --post302 -w "%{http_code}" http://$GOGS_SVC:3000/user/sign_up \
+                --form user_name=$GOGS_USER \
+                --form password=$GOGS_PWD \
+                --form retype=$GOGS_PWD \
+                --form email=admin@gogs.com)
+              if [ "200" == "$_RETURN" ]
+              then
+                break
+              fi
+            done
 
             sleep 5
 
